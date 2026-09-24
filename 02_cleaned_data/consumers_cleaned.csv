@@ -1,0 +1,15 @@
+category,subcategory,unit,fy16,fy15,pct_change,fy16_count,fy15_count
+LT,Domestic,Nos. in Lakhs,75.81,71.58,5.91,7581000.0,7158000.0
+LT,Commercial,Nos. in Lakhs,9.45,8.65,9.2,944999.9999999999,865000.0
+LT,Industrial,Nos. in Lakhs,1.89,1.75,8.26,189000.0,175000.0
+LT,Others,Nos. in Lakhs,6.07,4.6,31.88,607000.0,459999.99999999994
+LT,Total LT Excluding Agricultural,Nos. in Lakhs,93.22,86.63,7.6,9322000.0,8663000.0
+LT,Agriculture,Nos. in Lakhs,8.11,7.7,5.37,811000.0,770000.0
+LT,Total L. T. Including Agricultural,Nos. in Lakhs,101.33,94.33,7.42,10133000.0,9433000.0
+HT,Industrial,Nos.,6297.0,5414.0,16.31,6297.0,5414.0
+HT,Commercial,Nos.,5827.0,4893.0,19.09,5827.0,4893.0
+HT,Others,Nos.,1477.0,1080.0,36.76,1477.0,1080.0
+HT,Total HT Excluding Agricultural,Nos.,13601.0,11387.0,19.44,13601.0,11387.0
+HT,Agriculture,Nos.,34.0,29.0,17.24,34.0,29.0
+HT,Total H. T. Including Agricultural,Nos.,13635.0,11416.0,19.44,13635.0,11416.0
+TOTAL,All consumers (LT+HT),Nos. in Lakhs,101.47,94.45,7.43,10147000.0,9445000.0

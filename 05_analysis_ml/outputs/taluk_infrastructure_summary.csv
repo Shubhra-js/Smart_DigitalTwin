@@ -1,0 +1,24 @@
+district,taluk,substation_count,avg_asset_age,pct_high_risk,avg_risk_score,distribution_substations,transmission_substations
+Bangalore Rural,Devanahalli,4,35.5,0.0,0.399,3,1
+Bangalore Rural,Doddaballapura,8,28.1,0.0,0.35,6,2
+Bangalore Rural,Hosakote,8,29.1,0.0,0.365,7,1
+Bangalore Rural,Nelamangala,7,21.6,0.0,0.305,5,2
+Bangalore Urban,Anekal,12,21.8,0.0,0.309,9,3
+Bangalore Urban,Bangalore East,24,28.1,0.0,0.351,18,6
+Bangalore Urban,Bangalore North,45,25.6,2.2,0.341,39,6
+Bangalore Urban,Bangalore South,43,24.8,0.0,0.333,36,7
+Chikkaballapur,Bagepalli,8,26.1,0.0,0.345,7,1
+Chikkaballapur,Chikkaballapur,5,29.2,0.0,0.373,5,0
+Chikkaballapur,Chintamani,8,27.9,0.0,0.357,7,1
+Chikkaballapur,Gowribidanur,8,25.8,0.0,0.343,7,1
+Chikkaballapur,Gudibande,2,20.5,0.0,0.315,2,0
+Chikkaballapur,Shidlagatta,8,23.6,0.0,0.336,8,0
+Kolar,Bangarpet,7,29.5,0.0,0.367,7,0
+Kolar,Kolar,12,22.3,0.0,0.322,11,1
+Kolar,Malur,7,29.6,0.0,0.367,6,1
+Kolar,Mulbagal,8,21.5,0.0,0.322,8,0
+Kolar,Srinivaspur,7,23.9,0.0,0.338,7,0
+Ramanagar,Channapatna,7,27.3,0.0,0.355,7,0
+Ramanagar,Kanakapura,19,16.8,0.0,0.288,18,1
+Ramanagar,Magadi,12,17.8,0.0,0.292,11,1
+Ramanagar,Ramanagara,11,23.5,0.0,0.33,10,1

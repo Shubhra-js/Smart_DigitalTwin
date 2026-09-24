@@ -1,0 +1,24 @@
+{
+  "pm25": {
+    "coefficients": {
+      "trend_per_month": -0.6933,
+      "seasonal_sin": -3.537,
+      "seasonal_cos": 7.433
+    },
+    "intercept": 46.12,
+    "holdout_MAE": 20.6,
+    "holdout_R2": -9.238,
+    "n_train_samples": 24
+  },
+  "pm10": {
+    "coefficients": {
+      "trend_per_month": -0.0971,
+      "seasonal_sin": 6.914,
+      "seasonal_cos": 7.138
+    },
+    "intercept": 90.03,
+    "holdout_MAE": 12.22,
+    "holdout_R2": -2.518,
+    "n_train_samples": 24
+  }
+}

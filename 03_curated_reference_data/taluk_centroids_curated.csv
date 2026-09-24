@@ -1,0 +1,24 @@
+district,taluk,approx_lat,approx_lon,notes
+Bangalore Urban,Bangalore North,13.0359,77.5970,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Urban,Bangalore South,12.9081,77.5831,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Urban,Bangalore East,12.9789,77.6408,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Urban,Anekal,12.7106,77.6955,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Rural,Devanahalli,13.2437,77.7136,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Rural,Doddaballapura,13.2946,77.5384,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Rural,Hosakote,13.0709,77.7982,Approximate taluk-town centroid; curated for map plotting only
+Bangalore Rural,Nelamangala,13.0983,77.3956,Approximate taluk-town centroid; curated for map plotting only
+Ramanagar,Ramanagara,12.7217,77.2812,Approximate taluk-town centroid; curated for map plotting only
+Ramanagar,Channapatna,12.6513,77.2065,Approximate taluk-town centroid; curated for map plotting only
+Ramanagar,Kanakapura,12.5457,77.4189,Approximate taluk-town centroid; curated for map plotting only
+Ramanagar,Magadi,12.9599,77.2245,Approximate taluk-town centroid; curated for map plotting only
+Kolar,Kolar,13.1367,78.1298,Approximate taluk-town centroid; curated for map plotting only
+Kolar,Bangarpet,12.9908,78.1747,Approximate taluk-town centroid; curated for map plotting only
+Kolar,Malur,12.9581,77.9366,Approximate taluk-town centroid; curated for map plotting only
+Kolar,Mulbagal,13.1611,78.3944,Approximate taluk-town centroid; curated for map plotting only
+Kolar,Srinivaspur,13.3467,78.2126,Approximate taluk-town centroid; curated for map plotting only
+Chikkaballapur,Chikkaballapur,13.4351,77.7315,Approximate taluk-town centroid; curated for map plotting only
+Chikkaballapur,Chintamani,13.4008,78.0570,Approximate taluk-town centroid; curated for map plotting only
+Chikkaballapur,Gowribidanur,13.6128,77.5220,Approximate taluk-town centroid; curated for map plotting only
+Chikkaballapur,Gudibande,13.7833,77.5833,Approximate taluk-town centroid; curated for map plotting only
+Chikkaballapur,Bagepalli,13.7897,77.7947,Approximate taluk-town centroid; curated for map plotting only
+Chikkaballapur,Shidlagatta,13.3945,77.9081,Approximate taluk-town centroid; curated for map plotting only

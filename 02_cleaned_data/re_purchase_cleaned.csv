@@ -1,0 +1,13 @@
+source,energy_mu,amount_crore,rs_per_unit,is_aggregate_row
+Co-Generation,0.0,0.0,,False
+Bio-Mass,39.36,20.5,5.21,False
+Mini-Hydel,453.41,144.95,3.2,False
+Wind,2160.72,773.61,3.58,False
+Jindal solar & others,70.98,51.43,7.25,False
+Sec 11 RE purchase,553.49,281.17,5.08,False
+Short term RE Purchase,552.8,280.82,5.08,False
+Bundled power solar,56.8,60.26,10.61,False
+KPCL solar,4.07,2.46,6.05,False
+Total,3891.63,1615.22,4.15,True
+solar,131.86,114.15,8.66,True
+Non Solar,3759.78,1501.06,3.99,True

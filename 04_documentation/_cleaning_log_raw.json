@@ -1,0 +1,44 @@
+[
+  {
+    "dataset": "Substations",
+    "kept": "district, taluk, substation_name, voltage_kv, commission_date, commission_year, asset_age_years, infrastructure_tier",
+    "removed": "Sl.No (identifier), Zone (constant value)",
+    "reason": "Sl.No carries no analytical meaning; Zone is 100% 'Bengaluru' for every row so it adds no variance. 1 row had a missing commission date -> kept as NaN (age unknown) rather than guessed."
+  },
+  {
+    "dataset": "Energy Requirement",
+    "kept": "metric, approved_fy1516, actual_fy1516, achievement_pct (derived)",
+    "removed": "sl_no (identifier)",
+    "reason": "Row index has no analytical meaning. achievement_pct derived to show plan-vs-actual gap."
+  },
+  {
+    "dataset": "Number of Consumers",
+    "kept": "category(LT/HT/TOTAL), subcategory, fy16, fy15, pct_change, fy16_count/fy15_count (derived, unit-normalised)",
+    "removed": "Section header rows (blank placeholder rows for 'LT'/'HT' group titles), sl-no column 'A'",
+    "reason": "Header/group rows carried no data (blank fy16/fy15); reshaped from a wide printed-report layout into tidy rows and normalised Lakhs->absolute counts so LT and HT are on one comparable numeric scale."
+  },
+  {
+    "dataset": "Number of Units Sold",
+    "kept": "category(LT/HT/TOTAL), subcategory, fy16_MU, fy15_MU, pct_change",
+    "removed": "Section header rows, sl-no column",
+    "reason": "Same reshape logic as Consumers dataset; already single-unit (MU) so no unit conversion needed."
+  },
+  {
+    "dataset": "Operating Ratio",
+    "kept": "cost_component, fy16_pct, fy15_pct, fy14_pct",
+    "removed": "sl_no (identifier), 'Total' row (always exactly 100%, redundant)",
+    "reason": "Total row is definitionally 100% every year and adds no information; kept as documented invariant only."
+  },
+  {
+    "dataset": "Renewable Energy Purchase",
+    "kept": "source, energy_mu, amount_crore, rs_per_unit, is_aggregate_row (flag)",
+    "removed": "nothing removed",
+    "reason": "All rows kept; 'Total'/'solar'/'Non Solar' rows flagged as aggregates (not individual sources) so downstream charts don't double count them against the individual-source rows."
+  },
+  {
+    "dataset": "Air Quality",
+    "kept": "date, pm25, pm10, no2, so2, o3, sensor_count",
+    "removed": "nothing removed (city column kept though constant, needed for future multi-city extension)",
+    "reason": "'NA' text in O3 (sensor not yet deployed pre-Jun-2018) correctly parsed to null rather than 0, so the ML model does not learn a false 'drop to zero' pattern."
+  }
+]

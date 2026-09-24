@@ -1,0 +1,15 @@
+category,subcategory,unit_MU,fy16_MU,fy15_MU,pct_change
+LT,Domestic,MU,6156.1,5854.57,5.15
+LT,Commercial,MU,1754.07,1663.33,5.46
+LT,Industrial,MU,1150.4,1134.22,1.43
+LT,others,MU,938.46,1014.45,-7.49
+LT,Total LT Excluding Agricultural,MU,9999.02,9666.6,3.44
+LT,Agriculture,MU,6197.85,5938.79,4.36
+LT,Total L. T. Including Agricultural,MU,16196.88,15605.4,3.79
+HT,Industrial,MU,4593.21,4750.15,-3.3
+HT,Commercial,MU,2614.9,2795.89,-6.47
+HT,others,MU,1076.09,1266.39,-15.03
+HT,Total HT Excluding Agricultural,MU,8284.2,8812.44,-5.99
+HT,Agriculture,MU,57.11,18.29,212.24
+HT,Total H. T. Including Agricultural,MU,8341.31,8830.72,-5.54
+TOTAL,All units sold (LT+HT),MU,24538.19,24436.08,0.42

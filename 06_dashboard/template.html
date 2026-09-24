@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bengaluru Smart-City Digital Twin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0f1417; --panel:#161d22; --panel2:#1b2329; --line:#2a343b;
+  --ink:#eef2f4; --ink-dim:#9aabb3; --amber:#e8a33d; --amber-dim:#7a5a28;
+  --teal:#3fa796; --red:#d8654f; --yellow:#e0c341; --green:#5fb37c;
+  --radius:2px;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root:not([data-theme="light"]){ }
+:root[data-theme="light"]{
+  --bg:#f4f2ee; --panel:#ffffff; --panel2:#f0eee8; --line:#dcd8cf;
+  --ink:#1c2226; --ink-dim:#5b6870; --amber:#b8791f; --amber-dim:#e8d6b0;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{
+  margin:0; min-height:100%; background:var(--bg); color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:14px; line-height:1.5;
+}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+header{
+  border-bottom:1px solid var(--line); padding:18px 24px; position:sticky; top:0;
+  background:var(--bg); z-index:20; padding-top:calc(18px + env(safe-area-inset-top,0px));
+  display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:10px;
+}
+header h1{font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; margin:0; letter-spacing:.2px;}
+header h1 span{color:var(--amber);}
+header .sub{color:var(--ink-dim); font-size:12px; margin-top:2px;}
+.hdr-right{display:flex; align-items:center; gap:14px;}
+#themeToggle{background:none;border:1px solid var(--line);color:var(--ink-dim);border-radius:var(--radius);padding:6px 10px;cursor:pointer;font-size:12px;}
+nav{
+  display:flex; gap:2px; padding:0 24px; border-bottom:1px solid var(--line); overflow-x:auto;
+  background:var(--bg); position:sticky; top:64px; z-index:19;
+}
+nav button{
+  background:none; border:none; color:var(--ink-dim); padding:12px 14px; font-size:13px;
+  cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; font-weight:500;
+}
+nav button.active{color:var(--amber); border-bottom-color:var(--amber);}
+main{padding:22px 24px 60px; max-width:1180px; margin:0 auto;}
+.view{display:none;} .view.active{display:block;}
+.grid{display:grid; gap:14px;}
+.kpi-grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));}
+.kpi{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;
+}
+.kpi .label{color:var(--ink-dim); font-size:11.5px; text-transform:uppercase; letter-spacing:.4px;}
+.kpi .value{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; margin-top:6px;}
+.kpi .value.amber{color:var(--amber);} .kpi .value.teal{color:var(--teal);}
+.kpi .foot{color:var(--ink-dim); font-size:11.5px; margin-top:4px;}
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin-top:16px;}
+.panel h2{font-family:'Space Grotesk',sans-serif; font-size:15px; margin:0 0 4px; font-weight:600;}
+.panel .desc{color:var(--ink-dim); font-size:12.5px; margin-bottom:14px; max-width:70ch;}
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media(max-width:760px){.two-col{grid-template-columns:1fr;}}
+table{width:100%; border-collapse:collapse; font-size:12.5px;}
+th,td{text-align:left; padding:7px 8px; border-bottom:1px solid var(--line);}
+th{color:var(--ink-dim); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.3px;}
+td.num{text-align:right; font-family:'JetBrains Mono',monospace;}
+.badge{display:inline-block; padding:2px 7px; border-radius:2px; font-size:11px; font-weight:600;}
+.badge.high{background:rgba(216,101,79,.18); color:var(--red);}
+.badge.medium{background:rgba(224,195,65,.18); color:var(--yellow);}
+.badge.low{background:rgba(95,179,124,.18); color:var(--green);}
+.chart-wrap{position:relative; height:280px;}
+.chart-wrap.tall{height:340px;}
+.note{font-size:11.5px; color:var(--ink-dim); border-left:2px solid var(--amber-dim); padding:6px 10px; margin-top:10px;}
+.map-svg-wrap{width:100%; overflow-x:auto;}
+.slider-row{display:grid; grid-template-columns:220px 1fr 70px; align-items:center; gap:12px; margin:14px 0;}
+.slider-row label{font-size:12.5px; color:var(--ink-dim);}
+input[type=range]{width:100%; accent-color:var(--amber);}
+.slider-val{font-family:'JetBrains Mono',monospace; text-align:right; color:var(--amber); font-size:13px;}
+.result-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px;}
+.result{background:var(--panel2); border:1px solid var(--line); padding:12px 14px; border-radius:var(--radius);}
+.result .label{color:var(--ink-dim); font-size:11px; text-transform:uppercase;}
+.result .value{font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; margin-top:4px; color:var(--teal);}
+.formula{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-dim); margin-top:3px;}
+.alert{border:1px solid var(--red); background:rgba(216,101,79,.08); border-radius:var(--radius); padding:10px 14px; font-size:12.5px; margin-top:10px;}
+.alert.warn{border-color:var(--yellow); background:rgba(224,195,65,.08);}
+.legend-dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px;}
+footer{color:var(--ink-dim); font-size:11px; padding:24px; text-align:center; border-top:1px solid var(--line);}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div>
+    <h1>Bengaluru <span>Digital Twin</span></h1>
+    <div class="sub">Smart-city infrastructure &amp; environment model · BESCOM grid data + CPCB air quality, 2015&ndash;2018</div>
+  </div>
+  <div class="hdr-right">
+    <button id="themeToggle" onclick="toggleTheme()">Light mode</button>
+  </div>
+</header>
+<nav id="tabs"></nav>
+<main id="main"></main>
+<footer>Built entirely from the 7 datasets supplied (BESCOM operational tables + CPCB Bengaluru air-quality series). Map coordinates and AQI category bands are clearly-labelled curated/reference data, not part of the source tables. No figures are invented.</footer>
+<script id="data-blob" type="application/json">__DATA_JSON__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('data-blob').textContent);
+function toggleTheme(){
+  const r=document.documentElement; const cur=r.getAttribute('data-theme');
+  if(cur==='light'){r.removeAttribute('data-theme'); document.getElementById('themeToggle').textContent='Light mode';}
+  else{r.setAttribute('data-theme','light'); document.getElementById('themeToggle').textContent='Dark mode';}
+}
+const fmt=(n,d=0)=> (n===null||n===undefined||isNaN(n))?'—':Number(n).toLocaleString('en-IN',{maximumFractionDigits:d,minimumFractionDigits:d});
+
+/* ---------------- TABS ---------------- */
+const TABS = [
+  ['overview','Overview'],
+  ['infra','Infrastructure & Risk'],
+  ['energy','Energy Demand'],
+  ['renewable','Renewable & Cost'],
+  ['air','Air Quality'],
+  ['whatif','What-If Simulator'],
+];
+const tabsEl = document.getElementById('tabs');
+TABS.forEach(([id,label],i)=>{
+  const b=document.createElement('button'); b.textContent=label; b.onclick=()=>showTab(id);
+  b.id='tabbtn-'+id; if(i===0)b.classList.add('active');
+  tabsEl.appendChild(b);
+});
+function showTab(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.getElementById('tabbtn-'+id).classList.add('active');
+}
+const main = document.getElementById('main');
+TABS.forEach(([id])=>{ const d=document.createElement('div'); d.className='view'; d.id='view-'+id; main.appendChild(d); });
+document.getElementById('view-overview').classList.add('active');
+
+/* ================= helpers to read cleaned data ================= */
+const getMetric = (name)=> DATA.energy_requirement.find(r=>r.metric===name);
+const consTotal = DATA.consumers.find(r=>r.category==='TOTAL');
+const unitsTotal = DATA.units_sold.find(r=>r.category==='TOTAL');
+const distLoss = getMetric('Distribution Loss %');
+const transLoss = getMetric('Transmission Loss %');
+const energySales = getMetric('Energy Sales');
+const reTotal = DATA.re_purchase.find(r=>r.source==='Total');
+const reSolar = DATA.re_purchase.find(r=>r.source==='solar');
+const latestAQI = DATA.aqi_monthly[DATA.aqi_monthly.length-1];
+function aqiCategory(pm25){
+  const b = DATA.cpcb_bands.find(b=> pm25>=b.pm25_ugm3_min && pm25<=b.pm25_ugm3_max);
+  return b ? b.category : '—';
+}
+const highRiskCount = DATA.substations.filter(s=>s.risk_band==='High').length;
+const medRiskCount = DATA.substations.filter(s=>s.risk_band==='Medium').length;
+const avgAge = DATA.substations.reduce((a,s)=>a+(s.asset_age_years||0),0)/DATA.substations.filter(s=>s.asset_age_years).length;
+
+/* ================= OVERVIEW ================= */
+document.getElementById('view-overview').innerHTML = `
+<div class="grid kpi-grid">
+  <div class="kpi"><div class="label">Electricity Consumers (FY16)</div><div class="value amber">${fmt(consTotal.fy16_count/100000,2)}L</div><div class="foot">+${consTotal.pct_change}% vs FY15</div></div>
+  <div class="kpi"><div class="label">Units Sold (FY16)</div><div class="value amber">${fmt(unitsTotal.fy16_MU)} MU</div><div class="foot">${unitsTotal.pct_change>=0?'+':''}${unitsTotal.pct_change}% vs FY15</div></div>
+  <div class="kpi"><div class="label">Distribution Loss</div><div class="value">${distLoss.actual_fy1516}%</div><div class="foot">target ${distLoss.approved_fy1516}% · achieved ${distLoss.achievement_pct}%</div></div>
+  <div class="kpi"><div class="label">Substations Tracked</div><div class="value teal">${DATA.substations.length}</div><div class="foot">avg age ${fmt(avgAge,1)} yrs · 23 taluks</div></div>
+  <div class="kpi"><div class="label">High / Medium Risk Assets</div><div class="value" style="color:var(--red)">${highRiskCount+medRiskCount}</div><div class="foot">${highRiskCount} high · ${medRiskCount} medium</div></div>
+  <div class="kpi"><div class="label">Latest PM2.5 (${latestAQI.month_year})</div><div class="value teal">${latestAQI.pm25} µg/m³</div><div class="foot">${aqiCategory(latestAQI.pm25)} (CPCB reference band)</div></div>
+</div>
+<div class="panel">
+  <h2>What this Digital Twin covers</h2>
+  <div class="desc">Two real BESCOM/CPCB data layers were combined into one city model: (1) the electricity grid — demand, losses, consumer growth, renewable mix and 280 physical substations; (2) ambient air quality — a 24-month pollutant time series. They are linked at the Bengaluru city / taluk level and jointly drive the risk assessment and what-if simulator in the tabs above.</div>
+  <table>
+    <tr><th>Dataset</th><th>Time basis</th><th>Primary use in this twin</th></tr>
+    <tr><td>Energy Requirement</td><td>FY2015-16 (Approved vs Actual)</td><td>Monitoring — demand vs plan, network loss</td></tr>
+    <tr><td>Consumers</td><td>FY15 vs FY16</td><td>Analysis + growth-rate input to What-If simulator</td></tr>
+    <tr><td>Units Sold</td><td>FY15 vs FY16</td><td>Analysis + demand-projection input</td></tr>
+    <tr><td>Operating Ratio</td><td>FY14–FY16</td><td>Analysis — utility cost-structure trend</td></tr>
+    <tr><td>Renewable Purchase</td><td>2015-16 snapshot</td><td>Monitoring — sustainability mix, cost/unit</td></tr>
+    <tr><td>Substations (280)</td><td>Commission dates 1919*–2015</td><td>Infrastructure map + rule-based risk/stress index</td></tr>
+    <tr><td>Air Quality (24 mo.)</td><td>Jan-2017 to Dec-2018</td><td>Prediction — linear trend+seasonal PM2.5/PM10 forecast</td></tr>
+  </table>
+  <div class="note">* oldest/newest commission years vary by asset; see Infrastructure tab.</div>
+</div>`;
+
+/* ================= INFRASTRUCTURE & RISK ================= */
+const riskColor = b => b==='High' ? getComputedStyle(document.documentElement).getPropertyValue('--red') :
+                        b==='Medium' ? getComputedStyle(document.documentElement).getPropertyValue('--yellow') :
+                        getComputedStyle(document.documentElement).getPropertyValue('--green');
+function buildMapSVG(){
+  const lats = DATA.substations.map(s=>s.map_lat), lons = DATA.substations.map(s=>s.map_lon);
+  const minLa=Math.min(...lats), maxLa=Math.max(...lats), minLo=Math.min(...lons), maxLo=Math.max(...lons);
+  const W=760,H=560,pad=30;
+  const x = lo => pad + (lo-minLo)/(maxLo-minLo)*(W-2*pad);
+  const y = la => H-pad - (la-minLa)/(maxLa-minLa)*(H-2*pad);
+  let pts = DATA.substations.map(s=>`<circle cx="${x(s.map_lon).toFixed(1)}" cy="${y(s.map_lat).toFixed(1)}" r="${s.voltage_kv>=220?4.2:2.6}" fill="${riskColor(s.risk_band)}" opacity="0.85"><title>${s.substation_name} (${s.taluk}) — ${s.voltage_kv}kV, age ${s.asset_age_years||'?'}y, risk ${s.risk_band}</title></circle>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:560px" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="var(--panel2)"/>
+    ${pts}
+  </svg>`;
+}
+document.getElementById('view-infra').innerHTML = `
+<div class="panel">
+  <h2>Schematic substation map (280 assets, 23 taluks)</h2>
+  <div class="desc">Positions are jittered around curated approximate taluk-centre coordinates (not GPS-surveyed — no coordinates existed in the source data). Point size = voltage tier (large = 220/400kV transmission, small = 66kV distribution). Colour = rule-based asset risk band.</div>
+  <div class="map-svg-wrap">${buildMapSVG()}</div>
+  <div style="margin-top:10px;font-size:12px;color:var(--ink-dim)">
+    <span class="legend-dot" style="background:var(--red)"></span>High risk &nbsp;
+    <span class="legend-dot" style="background:var(--yellow)"></span>Medium risk &nbsp;
+    <span class="legend-dot" style="background:var(--green)"></span>Low risk
+  </div>
+</div>
+<div class="panel">
+  <h2>How the risk score is built (rule-based, not ML)</h2>
+  <div class="desc">No outage/failure history exists in the data, so there is no valid label to train a predictive model on. Instead: <span class="mono">risk = 0.7 × age_risk + 0.3 × tier_weight</span>, where age_risk = asset age ÷ oldest asset in the fleet, and tier_weight = 0.6 for 66kV distribution substations (closer to consumers, less meshed redundancy) or 0.4 for 220/400kV transmission substations. Bands: High ≥0.65, Medium ≥0.45, Low below. All weights are stated assumptions, not fitted from data.</div>
+</div>
+<div class="panel">
+  <h2>Taluks by average infrastructure risk</h2>
+  <table id="taluk-table"></table>
+</div>`;
+{
+  const rows = [...DATA.taluk_summary].sort((a,b)=>b.avg_risk_score-a.avg_risk_score).slice(0,10);
+  let html = '<tr><th>District</th><th>Taluk</th><th>Substations</th><th>Avg age (yrs)</th><th>% High risk</th><th>Avg risk score</th></tr>';
+  rows.forEach(r=>{ html += `<tr><td>${r.district}</td><td>${r.taluk}</td><td class="num">${r.substation_count}</td><td class="num">${r.avg_asset_age}</td><td class="num">${r.pct_high_risk}%</td><td class="num">${r.avg_risk_score}</td></tr>`; });
+  document.getElementById('taluk-table').innerHTML = html;
+}
+
+/* ================= ENERGY DEMAND ================= */
+document.getElementById('view-energy').innerHTML = `
+<div class="grid kpi-grid">
+  <div class="kpi"><div class="label">Energy Sales, FY16 actual</div><div class="value">${fmt(energySales.actual_fy1516)} MU</div><div class="foot">vs approved ${fmt(energySales.approved_fy1516)} MU (${energySales.achievement_pct}%)</div></div>
+  <div class="kpi"><div class="label">Distribution Loss</div><div class="value">${distLoss.actual_fy1516}%</div><div class="foot">approved ${distLoss.approved_fy1516}%</div></div>
+  <div class="kpi"><div class="label">Transmission Loss</div><div class="value">${transLoss.actual_fy1516}%</div><div class="foot">approved ${transLoss.approved_fy1516}%</div></div>
+</div>
+<div class="panel"><h2>Consumers by category — FY15 vs FY16</h2><div class="desc">LT categories shown in absolute count (Lakhs × 100,000); HT shown in absolute connections, on the same axis.</div><div class="chart-wrap tall"><canvas id="chConsumers"></canvas></div></div>
+<div class="panel"><h2>Units sold by category (MU) — FY15 vs FY16</h2><div class="chart-wrap tall"><canvas id="chUnits"></canvas></div></div>
+<div class="panel"><h2>Utility operating-cost structure, FY14–FY16</h2><div class="desc">Share of total operating cost by component. Power-purchase cost dominates and is falling as a share; transmission and repair/maintenance shares are rising.</div><div class="chart-wrap tall"><canvas id="chOpRatio"></canvas></div></div>
+`;
+
+/* ================= RENEWABLE & COST ================= */
+document.getElementById('view-renewable').innerHTML = `
+<div class="grid kpi-grid">
+  <div class="kpi"><div class="label">Total RE Purchased, 2015-16</div><div class="value teal">${fmt(reTotal.energy_mu)} MU</div><div class="foot">₹${fmt(reTotal.amount_crore)} Cr · avg ₹${reTotal.rs_per_unit}/unit</div></div>
+  <div class="kpi"><div class="label">Solar share of RE mix</div><div class="value teal">${fmt(reSolar.energy_mu/reTotal.energy_mu*100,1)}%</div><div class="foot">₹${reSolar.rs_per_unit}/unit (solar)</div></div>
+</div>
+<div class="panel"><h2>Renewable energy purchase by source (2015-16)</h2><div class="desc">Individual sources only (aggregate rows excluded from the chart).</div><div class="chart-wrap tall"><canvas id="chRE"></canvas></div></div>
+<div class="panel"><h2>Purchase cost per unit by source</h2><div class="chart-wrap"><canvas id="chREcost"></canvas></div></div>
+`;
+
+/* ================= AIR QUALITY ================= */
+document.getElementById('view-air').innerHTML = `
+<div class="grid kpi-grid">
+  <div class="kpi"><div class="label">Latest PM2.5</div><div class="value teal">${latestAQI.pm25}</div><div class="foot">µg/m³, ${latestAQI.month_year} · ${aqiCategory(latestAQI.pm25)}</div></div>
+  <div class="kpi"><div class="label">Latest PM10</div><div class="value teal">${latestAQI.pm10}</div><div class="foot">µg/m³, ${latestAQI.month_year}</div></div>
+  <div class="kpi"><div class="label">Model holdout accuracy</div><div class="value" style="color:var(--red)">Low</div><div class="foot">MAE ${DATA.aqi_model_metrics.pm25.holdout_MAE} µg/m³ on last 4 months</div></div>
+</div>
+<div class="alert warn">The forecast model is a simple linear-trend + seasonal regression trained on only 24 monthly points. Its holdout R² is negative (worse than a flat average on the most recent 4 months) — treat the forecast as an illustrative direction only, not a reliable prediction. This is disclosed deliberately rather than hidden.</div>
+<div class="panel"><h2>PM2.5 &amp; PM10 — actual, model fit, and 6-month forecast</h2><div class="desc">Solid = actual monthly mean. Dashed = model fit / forecast continuation from Jan-2019.</div><div class="chart-wrap tall"><canvas id="chAQI"></canvas></div></div>
+<div class="panel"><h2>CPCB reference AQI bands (PM2.5, µg/m³) — published national standard, shown for context only</h2>
+<table><tr><th>Category</th><th>PM2.5 range</th><th>Health note</th></tr>
+${DATA.cpcb_bands.map(b=>`<tr><td>${b.category}</td><td class="num">${b.pm25_ugm3_min}–${b.pm25_ugm3_max}</td><td>${b.health_note}</td></tr>`).join('')}
+</table>
+<div class="note">These are official CPCB India breakpoints (24-hr average basis) applied here to monthly means for illustrative categorisation only — not an official AQI reading.</div>
+</div>`;
+
+/* ---- charts (built after DOM is present) ---- */
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+Chart.defaults.color = '#9aabb3'; Chart.defaults.borderColor = 'rgba(154,171,179,.15)'; Chart.defaults.font.family="Inter";
+
+new Chart(document.getElementById('chConsumers'), {type:'bar', data:{
+  labels:['Domestic','Commercial','Industrial','Others','Agriculture','Total LT','HT Industrial','HT Commercial'],
+  datasets:[
+    {label:'FY15', backgroundColor:'#3fa79680', data:[
+      DATA.consumers.find(r=>r.subcategory==='Domestic').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Commercial'&&r.category==='LT').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Industrial'&&r.category==='LT').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Others').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Agriculture'&&r.category==='LT').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Total L. T. Including Agricultural').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Industrial'&&r.category==='HT').fy15_count,
+      DATA.consumers.find(r=>r.subcategory==='Commercial'&&r.category==='HT').fy15_count,
+    ]},
+    {label:'FY16', backgroundColor:'#e8a33d', data:[
+      DATA.consumers.find(r=>r.subcategory==='Domestic').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Commercial'&&r.category==='LT').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Industrial'&&r.category==='LT').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Others').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Agriculture'&&r.category==='LT').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Total L. T. Including Agricultural').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Industrial'&&r.category==='HT').fy16_count,
+      DATA.consumers.find(r=>r.subcategory==='Commercial'&&r.category==='HT').fy16_count,
+    ]},
+  ]}, options:{responsive:true,maintainAspectRatio:false, scales:{y:{type:'logarithmic', title:{display:true,text:'Consumers (log scale)'}}}}
+});
+
+new Chart(document.getElementById('chUnits'), {type:'bar', data:{
+  labels: DATA.units_sold.filter(r=>r.category!=='TOTAL' && !r.subcategory.startsWith('Total')).map(r=>r.category+' '+r.subcategory),
+  datasets:[
+    {label:'FY15 (MU)', backgroundColor:'#3fa79680', data: DATA.units_sold.filter(r=>r.category!=='TOTAL' && !r.subcategory.startsWith('Total')).map(r=>r.fy15_MU)},
+    {label:'FY16 (MU)', backgroundColor:'#e8a33d', data: DATA.units_sold.filter(r=>r.category!=='TOTAL' && !r.subcategory.startsWith('Total')).map(r=>r.fy16_MU)},
+  ]}, options:{responsive:true,maintainAspectRatio:false, indexAxis:'y'}
+});
+
+new Chart(document.getElementById('chOpRatio'), {type:'line', data:{
+  labels:['FY14','FY15','FY16'],
+  datasets: DATA.operating_ratio.map((r,i)=>({label:r.cost_component, data:[r.fy14_pct,r.fy15_pct,r.fy16_pct], borderColor:['#e8a33d','#3fa796','#d8654f','#e0c341','#5fb37c','#9aabb3','#c48fe0'][i%7], backgroundColor:'transparent', tension:.25}))
+  }, options:{responsive:true,maintainAspectRatio:false, scales:{y:{title:{display:true,text:'% of total operating cost'}}}}
+});
+
+const reRows = DATA.re_purchase.filter(r=>!r.is_aggregate_row);
+new Chart(document.getElementById('chRE'), {type:'doughnut', data:{
+  labels: reRows.map(r=>r.source), datasets:[{data:reRows.map(r=>r.energy_mu), backgroundColor:['#e8a33d','#3fa796','#d8654f','#e0c341','#5fb37c','#9aabb3','#c48fe0']}]
+  }, options:{responsive:true,maintainAspectRatio:false}
+});
+new Chart(document.getElementById('chREcost'), {type:'bar', data:{
+  labels: reRows.filter(r=>r.rs_per_unit).map(r=>r.source), datasets:[{label:'₹ per unit', backgroundColor:'#e8a33d', data: reRows.filter(r=>r.rs_per_unit).map(r=>r.rs_per_unit)}]
+  }, options:{responsive:true,maintainAspectRatio:false}
+});
+
+const aqiLabels = DATA.aqi_monthly.map(r=>r.month_year).concat(DATA.aqi_forecast.filter(r=>r.target==='pm25').map(r=>r.date.slice(0,7)));
+const pm25Actual = DATA.aqi_monthly.map(r=>r.pm25).concat(Array(6).fill(null));
+const pm25Forecast = Array(DATA.aqi_monthly.length-1).fill(null).concat([DATA.aqi_monthly[DATA.aqi_monthly.length-1].pm25]).concat(DATA.aqi_forecast.filter(r=>r.target==='pm25').map(r=>r.forecast));
+const pm10Actual = DATA.aqi_monthly.map(r=>r.pm10).concat(Array(6).fill(null));
+const pm10Forecast = Array(DATA.aqi_monthly.length-1).fill(null).concat([DATA.aqi_monthly[DATA.aqi_monthly.length-1].pm10]).concat(DATA.aqi_forecast.filter(r=>r.target==='pm10').map(r=>r.forecast));
+new Chart(document.getElementById('chAQI'), {type:'line', data:{labels:aqiLabels, datasets:[
+  {label:'PM2.5 actual', data:pm25Actual, borderColor:'#e8a33d', backgroundColor:'transparent', spanGaps:false, tension:.2},
+  {label:'PM2.5 forecast', data:pm25Forecast, borderColor:'#e8a33d', borderDash:[5,4], backgroundColor:'transparent', tension:.2},
+  {label:'PM10 actual', data:pm10Actual, borderColor:'#3fa796', backgroundColor:'transparent', spanGaps:false, tension:.2},
+  {label:'PM10 forecast', data:pm10Forecast, borderColor:'#3fa796', borderDash:[5,4], backgroundColor:'transparent', tension:.2},
+]}, options:{responsive:true,maintainAspectRatio:false, scales:{y:{title:{display:true,text:'µg/m³'}}}}});
+
+/* ================= WHAT-IF SIMULATOR ================= */
+const baseConsumerGrowth = DATA.consumers.find(r=>r.subcategory==='Total L. T. Including Agricultural').pct_change; // 7.42
+const baseUnitsGrowth = DATA.units_sold.find(r=>r.subcategory==='Total L. T. Including Agricultural').pct_change; // 3.79
+const baseLoss = parseFloat(distLoss.actual_fy1516); // 12.03
+const baseEnergyReq = parseFloat(getMetric('Energy Required MUs').actual_fy1516);
+const baseAvgCost = reTotal.amount_crore*1e7/(reTotal.energy_mu*1e6)*1e3; // approx blended Rs/unit from RE table structure -> derive simpler below
+const baseRsPerUnit = 4.15; // from RE_purchase 'Total' row rs_per_unit, sourced directly from data
+const baseSolarShare = reSolar.energy_mu/reTotal.energy_mu*100;
+const totalConsumersFY16 = consTotal.fy16_count;
+const highMedCount = highRiskCount+medRiskCount;
+
+document.getElementById('view-whatif').innerHTML = `
+<div class="panel">
+<h2>Scenario controls</h2>
+<div class="desc">All projections use simple, disclosed formulas built only from the baseline figures in the cleaned datasets (compound growth / linear scaling) — no hidden model. Adjust sliders to explore how demand, losses, renewable mix and infrastructure investment interact.</div>
+<div class="slider-row"><label>LT consumer annual growth rate (baseline ${baseConsumerGrowth}%)</label><input type="range" id="s1" min="0" max="15" step="0.5" value="${baseConsumerGrowth}" oninput="runSim()"><div class="slider-val" id="s1v"></div></div>
+<div class="slider-row"><label>Projection horizon (years)</label><input type="range" id="s2" min="1" max="10" step="1" value="5" oninput="runSim()"><div class="slider-val" id="s2v"></div></div>
+<div class="slider-row"><label>Target distribution loss % (baseline ${baseLoss}%)</label><input type="range" id="s3" min="6" max="${baseLoss}" step="0.1" value="${baseLoss}" oninput="runSim()"><div class="slider-val" id="s3v"></div></div>
+<div class="slider-row"><label>Solar share of RE purchase (baseline ${baseSolarShare.toFixed(1)}%)</label><input type="range" id="s4" min="${baseSolarShare.toFixed(1)}" max="80" step="1" value="${baseSolarShare.toFixed(1)}" oninput="runSim()"><div class="slider-val" id="s4v"></div></div>
+<div class="slider-row"><label>% of High/Medium-risk substations upgraded</label><input type="range" id="s5" min="0" max="100" step="5" value="0" oninput="runSim()"><div class="slider-val" id="s5v"></div></div>
+</div>
+
+<div class="panel">
+<h2>Simulated outcomes</h2>
+<div class="grid result-grid">
+  <div class="result"><div class="label">Projected LT consumers</div><div class="value" id="r1">—</div><div class="formula">baseline × (1+rate)^years</div></div>
+  <div class="result"><div class="label">Projected energy requirement</div><div class="value" id="r2">—</div><div class="formula">scaled with units-sold growth rate</div></div>
+  <div class="result"><div class="label">Energy saved from loss reduction</div><div class="value" id="r3">—</div><div class="formula">(baseline loss % − target %) × energy required</div></div>
+  <div class="result"><div class="label">Est. annual cost saved</div><div class="value" id="r4">—</div><div class="formula">energy saved × ₹${baseRsPerUnit}/unit (avg RE purchase rate, proxy)</div></div>
+  <div class="result"><div class="label">Remaining high/medium-risk assets</div><div class="value" id="r5">—</div><div class="formula">${highMedCount} assets × (1 − upgraded %)</div></div>
+  <div class="result"><div class="label">Renewable mix after solar shift</div><div class="value" id="r6">—</div><div class="formula">solar share reweights total RE MU</div></div>
+</div>
+<div id="alertBox"></div>
+</div>
+<div class="panel">
+<h2>Interpretation</h2>
+<div class="desc" id="interp">Adjust sliders above — the narrative here updates to explain what the combination of choices implies for planning.</div>
+</div>
+`;
+
+function runSim(){
+  const rate = parseFloat(document.getElementById('s1').value);
+  const years = parseInt(document.getElementById('s2').value);
+  const targetLoss = parseFloat(document.getElementById('s3').value);
+  const solarShare = parseFloat(document.getElementById('s4').value);
+  const upgradePct = parseInt(document.getElementById('s5').value);
+  document.getElementById('s1v').textContent = rate+'%/yr';
+  document.getElementById('s2v').textContent = years+' yr';
+  document.getElementById('s3v').textContent = targetLoss.toFixed(1)+'%';
+  document.getElementById('s4v').textContent = solarShare+'%';
+  document.getElementById('s5v').textContent = upgradePct+'%';
+
+  const projConsumers = totalConsumersFY16 * Math.pow(1+rate/100, years);
+  const projEnergyReq = baseEnergyReq * Math.pow(1+baseUnitsGrowth/100, years);
+  const lossReductionPts = baseLoss - targetLoss;
+  const energySavedMU = projEnergyReq * (lossReductionPts/100);
+  const costSavedCr = energySavedMU * 1e6 * baseRsPerUnit / 1e7; // MU->units(kWh)*Rs -> crore
+  const remainingRisk = Math.round(highMedCount * (1-upgradePct/100));
+  const solarMU = reTotal.energy_mu * (solarShare/100);
+
+  document.getElementById('r1').textContent = fmt(projConsumers/100000,2)+' L';
+  document.getElementById('r2').textContent = fmt(projEnergyReq)+' MU';
+  document.getElementById('r3').textContent = fmt(energySavedMU)+' MU/yr';
+  document.getElementById('r4').textContent = '₹'+fmt(costSavedCr,1)+' Cr/yr';
+  document.getElementById('r5').textContent = remainingRisk+' of '+highMedCount;
+  document.getElementById('r6').textContent = fmt(solarMU)+' MU solar';
+
+  let alerts = '';
+  if(rate>=10) alerts += `<div class="alert">Consumer growth above 10%/yr would add ${fmt(projConsumers-totalConsumersFY16)} connections in ${years} years — well beyond the ${baseConsumerGrowth}% historically observed; new substation capacity would likely be needed in high-growth taluks (see Infrastructure tab).</div>`;
+  if(remainingRisk>0 && upgradePct<100) alerts += `<div class="alert warn">${remainingRisk} substations remain in the High/Medium risk band — prioritise the taluks with the highest avg_risk_score shown in the Infrastructure tab.</div>`;
+  document.getElementById('alertBox').innerHTML = alerts;
+
+  document.getElementById('interp').textContent =
+    `At ${rate}%/yr consumer growth over ${years} years, LT connections rise from ${fmt(totalConsumersFY16/100000,2)}L to ~${fmt(projConsumers/100000,2)}L, `+
+    `while energy requirement (scaled at the observed ${baseUnitsGrowth}% units-sold growth rate) reaches ~${fmt(projEnergyReq)} MU. `+
+    `Cutting distribution loss from ${baseLoss}% to ${targetLoss.toFixed(1)}% recovers an estimated ${fmt(energySavedMU)} MU/yr (~₹${fmt(costSavedCr,1)} Cr/yr at the ₹${baseRsPerUnit}/unit reference rate). `+
+    `Upgrading ${upgradePct}% of at-risk substations leaves ${remainingRisk} of ${highMedCount} high/medium-risk assets. `+
+    `Shifting the renewable mix to ${solarShare}% solar implies ${fmt(solarMU)} MU of solar procurement out of the ${fmt(reTotal.energy_mu)} MU total RE purchase baseline.`;
+}
+runSim();
+</script>
+</body>
+</html>

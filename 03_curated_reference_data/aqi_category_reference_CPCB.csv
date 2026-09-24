@@ -1,0 +1,7 @@
+category,pm25_ugm3_min,pm25_ugm3_max,pm10_ugm3_min,pm10_ugm3_max,health_note
+Good,0,30,0,50,Minimal impact
+Satisfactory,31,60,51,100,Minor breathing discomfort to sensitive people
+Moderate,61,90,101,250,"Breathing discomfort to people with lung/heart disease, children, older adults"
+Poor,91,120,251,350,Breathing discomfort on prolonged exposure
+Very Poor,121,250,351,430,Respiratory illness on prolonged exposure
+Severe,251,10000,431,10000,"Affects healthy people, seriously impacts those with existing disease"
